@@ -2,6 +2,7 @@ const zod = require("zod");
 const { User } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
+const { Account } = require("../models/user");
 
 const signupBody = zod.object({
     username: zod.string().email(),
@@ -35,6 +36,13 @@ router.post("/signup", async (req, res) => {
         lastName: req.body.lastName,
     })
     const userId = user._id;
+
+
+  await Account.create({
+    userId,
+    balance:1+Math.random()*10000
+  })
+
 
     const token = jwt.sign({
         userId
@@ -80,4 +88,27 @@ router.post("/signin", async (req, res) => {
     res.status(411).json({
         message: "Error while logging in"
     })
+})
+
+router.get("/bulk",async(req,res)=>{
+    const filter=req.query.filer || '';
+    const users=await User.find({
+        $or:[
+            {
+                firstName:{$regex:filter,$options:'i'}
+            },
+            {
+                lastName:{$regex:filter,$options:'i'}
+            }
+        ]
+    })
+
+        res.json({
+            user:users.map(user=>({
+                firstName:user.firstName,
+                lastName:user.lastName,
+                _id:user._id
+
+            }))
+        })
 })
