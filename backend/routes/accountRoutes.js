@@ -1,7 +1,8 @@
 const { authMiddleware } = require("../middleware/middleware")
-const Account=require("../models/Account")
-
-
+const Account=require("../models/user").Account;
+const express=require("express");
+const router=express.Router();
+const mongoose=require("mongoose");
 router.get("/balance",authMiddleware,async(req,res)=>{
     const account=await Account.findOne({
         userId:req.userId
@@ -13,7 +14,7 @@ router.get("/balance",authMiddleware,async(req,res)=>{
 })
 
 
-route.post("/transfer",authMiddleware,async (req,res)=>{
+router.post("/transfer",authMiddleware,async (req,res)=>{
     const session=await mongoose.startSession();
     session.startTransaction();
 
