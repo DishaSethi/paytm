@@ -5,12 +5,15 @@ const rootRouter = require("./routes/index");
 const mongoose = require('mongoose');   
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 app.use(express.json());
 
 async function connectDB(){
     try{
-        await mongoose.connect("mongodb://localhost:27017/paytm"
+        await mongoose.connect("mongodb://localhost:27017/paytm?replicaSet=rs0"
         )
         console.log("Connected to DB");
 
