@@ -1,51 +1,64 @@
 .dashboard-container {
-  max-width: 700px;
-  margin: 30px auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 10px;
-  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
+
 .dashboard-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
   margin-bottom: 20px;
   text-align: center;
+  background: linear-gradient(90deg, #26a0da, #314755);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; /* for non-webkit browsers */
+  color: transparent; /* fallback */
+}
+
+.dashboard-container p {
+  font-size: 18px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #ccc;
 }
 
 .users-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .user-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fafafa;
-  transition: background 0.2s;
+  padding: 16px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #222, #333);
+  transition: 0.3s;
 }
 
 .user-row:hover {
-  background: #f1f1f1;
+  background: linear-gradient(145deg, #2e2e2e, #3a3a3a);
 }
 
 .user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: #4a90e2;
-  color: white;
+  background: linear-gradient(135deg, #4a90e2, #2e7eff);
+  color: #fff;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   font-weight: bold;
-  margin-right: 12px;
+  font-size: 20px;
+  margin-right: 16px;
 }
 
 .user-info {
@@ -55,31 +68,42 @@
 .user-name {
   font-weight: bold;
   margin: 0;
+  font-size: 16px;
 }
 
 .user-email {
   font-size: 14px;
-  color: #666;
+  color: #ccc;
   margin: 0;
 }
 
 .send-btn {
-  padding: 8px 14px;
+   background-image: linear-gradient(to right, #314755 0%, #26a0da 51%, #314755 100%);
+  margin: 10px auto;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;            
+  box-shadow: 0 0 20px #26a0da80;
+  border-radius: 10px;
+  display: block;
   border: none;
-  background: #222;
-  color: white;
-  border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-weight: bold;
 }
 
 .send-btn:hover {
-  background: #000;
+ background-position: right center; 
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 0 25px #26a0da;
 }
 
 .no-users {
   text-align: center;
-  color: #777;
+  color: #999;
   padding: 20px;
 }
 
@@ -87,5 +111,5 @@
   text-align: center;
   font-size: 18px;
   margin-top: 40px;
-  color: #555;
+  color: #aaa;
 }

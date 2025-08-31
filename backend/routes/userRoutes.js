@@ -3,6 +3,7 @@ const { User } = require("../models/user");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 const { Account } = require("../models/user");
+const {authMiddleware}=require("../middleware/middleware");
 const express=require("express");
 const router=express.Router();
 
@@ -80,7 +81,7 @@ router.post("/signin", async (req, res) => {
             userId: user._id
         }, JWT_SECRET);
   
-        res.json({
+        res.status(200).json({
             token: token
         })
         return;
@@ -92,9 +93,12 @@ router.post("/signin", async (req, res) => {
     })
 })
 
-router.get("/bulk",async(req,res)=>{
+router.get("/bulk",authMiddleware,async(req,res)=>{
     const filter=req.query.filer || '';
+        console.log("Current userId from authMiddleware:", req.userId); 
+ const currentUser= req.userId;
     const users=await User.find({
+        _id:{$ne:currentUser},
         $or:[
             {
                 firstName:{$regex:filter,$options:'i'}

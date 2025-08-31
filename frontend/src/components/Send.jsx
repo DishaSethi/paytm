@@ -1,17 +1,19 @@
-import { useState,useEffect } from "react";
-
+import { useState,useEffect, } from "react";
+import {useParams, useNavigate} from "react-router-dom";
 const Send=()=>{
     const {id}=useParams();
     const [amount,setAmount]=useState("");
     const navigate=useNavigate();
-
+ 
     const handleSubmit=async(e)=>{
         e.preventDefault();
         try{
-            const res=await fetch("http://localhost:3000/api/vi/account/transfer",{
+            const token=sessionStorage.getItem("token");
+            const res=await fetch("http://localhost:3000/api/v1/account/transfer",{
                 method:"POST",
                 headers:{
-                    "Content-Type":"application/json"
+                    "Content-Type":"application/json",
+                    "Authorization":`Bearer ${token}`
                 }, credentials:"include",
                 body:JSON.stringify({
                     to:id,
@@ -20,7 +22,7 @@ const Send=()=>{
             })
             const data=await res.json();
             if(!res.ok){
-                alert(data.message ||"Transfer failed");
+                alert(data.message || "Transfer failed");
                 return;
             }
 

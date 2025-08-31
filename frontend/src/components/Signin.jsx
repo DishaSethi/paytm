@@ -4,7 +4,7 @@ import "./Signin.css"; // optional CSS file
 
 const Signin = () => {
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
@@ -16,7 +16,7 @@ const Signin = () => {
     e.preventDefault();
     console.log("Signin data:", formData);
     try{
-    const res=fetch("http://localhost:3000/api/v1/user/signin",{
+    const res=await fetch("http://localhost:3000/api/v1/user/signin",{
         "method":"POST",
         "headers":{
             "Content-Type":"application/json"
@@ -40,7 +40,7 @@ const Signin = () => {
     console.log("Signin success",data);
     window.location.href = "/dashboard";
 }catch(error){
-      console.error("Network error:", err);
+      console.error("Network error:", error);
     alert("Something went wrong. Please try again.");
 }};
 
@@ -50,10 +50,10 @@ const Signin = () => {
       <h2>Sign In</h2>
       <form onSubmit={handleSubmit} className="signin-form">
         <input
-          type="email"
-          name="email"
-          placeholder="Enter your email"
-          value={formData.email}
+          type="text"
+          name="username"
+          placeholder="Enter your username"
+          value={formData.username}
           onChange={handleChange}
           required
         />

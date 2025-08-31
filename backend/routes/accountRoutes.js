@@ -4,13 +4,18 @@ const express=require("express");
 const router=express.Router();
 const mongoose=require("mongoose");
 router.get("/balance",authMiddleware,async(req,res)=>{
-    const account=await Account.findOne({
+  try{  const account=await Account.findOne({
         userId:req.userId
     })
 
-    return res.json({
+    return res.status(200).json({
         balance:account.balance
     })
+}catch(error){
+    res.status(400).json({
+        message:"Error in finding balance"
+    })
+}
 })
 
 
