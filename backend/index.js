@@ -1,9 +1,10 @@
+require("dotenv").config();
 // backend/index.js
 const express = require('express');
 const cors = require("cors");
 const rootRouter = require("./routes/index");
-const mongoose = require('mongoose');   
 const app = express();
+const pool = require("./db"); 
 
 app.use(cors({
   origin: "http://localhost:5173",
@@ -11,20 +12,14 @@ app.use(cors({
 }));
 app.use(express.json());
 
-async function connectDB(){
-    try{
-        await mongoose.connect("mongodb://localhost:27017/paytm?replicaSet=rs0"
-        )
-        console.log("Connected to DB");
-
-    }catch(err){
-        console.log("Error connection to DB",err);
-    }
-}
-connectDB();
+pool.connect()
+  .then(() => console.log("Connected to PostgreSQL DB ✅"))
+  .catch(err => console.error("Database connection error ❌", err));
 
 app.use("/api/v1", rootRouter);
 
-app.listen(3000,()=>{
-    console.log("Server started on port 3000");
+const PORT =process.env.PORT||3000;
+
+app.listen(PORT,()=>{
+    console.log(`Server started on port ${PORT}`);
 });

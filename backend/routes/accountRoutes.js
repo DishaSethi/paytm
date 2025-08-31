@@ -1,51 +1,94 @@
 const { authMiddleware } = require("../middleware/middleware")
 const Account=require("../models/user").Account;
+const Transaction = require("../models/transaction"); 
 const express=require("express");
 const router=express.Router();
-const mongoose=require("mongoose");
-router.get("/balance",authMiddleware,async(req,res)=>{
-  try{  const account=await Account.findOne({
-        userId:req.userId
-    })
+const pool=require("../db");
 
-    return res.status(200).json({
-        balance:account.balance
-    })
-}catch(error){
-    res.status(400).json({
-        message:"Error in finding balance"
-    })
-}
+router.get("/balance",authMiddleware,async(req,res)=>{
+ try{
+    userId=req.userId;
+    const result=await pool.query(
+        "SELECT balance FROM account WHERE user_id=$1",
+        [userId]
+    )
+
+    if(result.rows.length==0){
+        return res.status(404).json({
+            message:"Account not found"
+        });
+
+    }
+        return res.status(200).json({
+            balance:result.rows[0].balance
+        });
+
+
+ }catch(error){
+    console.error(error);
+    res.status(500).json({ message: "Error fetching balance" });
+ }
 })
 
 
 router.post("/transfer",authMiddleware,async (req,res)=>{
-    const session=await mongoose.startSession();
-    session.startTransaction();
-
+  const client= await pool.connect();
+  try{
     const {to,amount}=req.body;
+    const fromUser=req.userId;
 
-    const account=await Account.findOne({userId:req.userId}).session(session);
+    await client.query("BEGIN");
 
-    if(!account ||account.balance<amount){
-        await session.abortTransaction();
-       return res.status(400).json({message:"Insufficient balance"});
+    const senderbalanceRes=await client.query(
+        "SELECT balance FROM accounts WHERE user_id=$1 FOR UPDATE ",
+        [fromUser]
+    );
+
+    if(senderbalanceRes.rows.length==0){
+        throw new Error("Sender account not found");
 
     }
-    const toAccount=await Account.findOne({userId:to}).session(session);
-    if(!toAccount){
-        await session.abortTransaction();
-        return res.status(400).json({message:"Recipient account not found"});
+
+    const senderbalance=parseFloat(senderbalanceRes.rows[0].balance);
+    if(senderBalance<amount){
+        throw new error("Insufficent balance");
     }
 
-await Account.updateOne({userId:req.userId},{$inc:{balance:-amount}}).session(session);
-await Account.updateOne({userId:to},{$inc:{balance:amount}}).session(session);
+    const receiverbalanceRes=await client.query(
+        "SELECT balance FROM accounts WHERE user_id=$1 FOR UPDATE",
+        [to]
+    );
 
-await session.commitTransaction();
+    if(receiverbalanceRes.rows.length==0){
+        throw new Error("Receiver account not found");
+    }
+    await client.query("UPDATE accounts SET balance =balance-$1 WHERE user_id=$2",[amount,from]);
 
-res.json({
-    message:"Transfer successful"
-})
+    await client.query("UPDATE accounts SET balance= balance+$1 WHERE user_id=$2",[amount,to]);
+
+    await client.query(`INSERT INTO tranasactions(from,to,amount,type,status,created_at)
+        VALUES($1,$2,$3,$3,$4,$5,NOW())`,[from,to,amount,"transfer","completed"]);
+
+
+        await client.query("COMMIT");
+
+        res.status(200).json({
+            message:"Transfer successful"
+        });
+
+
+
+  }catch(err){
+    await client.query("ROLLBACK");
+    console.error(err);
+    res.status(400).json({
+        message:err.message|| "Transfer failed"
+    })
+  }finally{
+    client.release();
+  }
+
+   
 
   
 });
