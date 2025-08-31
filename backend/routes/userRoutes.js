@@ -95,6 +95,8 @@ router.post("/signin", async (req, res) => {
 
 router.get("/bulk",authMiddleware,async(req,res)=>{
     const filter=req.query.filer || '';
+      const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 3;
         console.log("Current userId from authMiddleware:", req.userId); 
  const currentUser= req.userId;
     const users=await User.find({
@@ -107,7 +109,8 @@ router.get("/bulk",authMiddleware,async(req,res)=>{
                 lastName:{$regex:filter,$options:'i'}
             }
         ]
-    })
+    })  .skip((page - 1) * limit)
+    .limit(limit);
 
         res.json({
             user:users.map(user=>({

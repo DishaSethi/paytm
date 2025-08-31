@@ -8,7 +8,10 @@ const Dashboard=()=>{
     const [users,setUsers]=useState([]);
     const [loading,setLoading]=useState(true);
     const [balance, setBalance]=useState(null);
+    const [page,setPage]=useState(1);
+     const [hasMore, setHasMore] = useState(true);
     const navigate=useNavigate();
+    const USERS_PER_PAGE = 3; 
 
     useEffect(() => {
     const fetchBalance = async () => {
@@ -47,10 +50,10 @@ const Dashboard=()=>{
   
 
     useEffect(()=>{
-        const fetchUsers=async()=>{
+        const fetchUsers=async(pageNum=1)=>{
             try{
                 const token=sessionStorage.getItem("token");
-                const res=await fetch("http://localhost:3000/api/v1/user/bulk",
+                const res=await fetch(`http://localhost:3000/api/v1/user/bulk?page=${pageNum}&limit=${USERS_PER_PAGE}`,
                    {
                        method:"GET",
                        headers:{
@@ -66,9 +69,13 @@ const Dashboard=()=>{
                 }
 
                 const data=await res.json();
-                setUsers(data.user);
-                
-
+                if (data.user.length < USERS_PER_PAGE) setHasMore(false)
+                    // setUsers((prev)=>[...prev,...data.user]);
+                if (pageNum === 1) {
+    setUsers(data.user); 
+} else {
+    setUsers((prev) => [...prev, ...data.user]); 
+}
             }catch(err){
                 console.log("Error fetching users",err);
             }finally{
@@ -77,8 +84,8 @@ const Dashboard=()=>{
 
 
         }
-        fetchUsers();
-    },[])
+        fetchUsers(page);
+    },[page])
     if(loading){
         return <div>Loading...</div>
 
@@ -110,6 +117,9 @@ const Dashboard=()=>{
                 )): <p className="no-users" >No users found</p>
                 }
             </div>
+            {hasMore &&(
+                <button onClick={()=>setPage((prev)=>prev+1)}> Load More</button>
+            )}
 
         </div>
 
