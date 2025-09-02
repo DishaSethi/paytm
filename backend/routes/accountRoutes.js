@@ -35,13 +35,13 @@ router.post("/transfer",authMiddleware,async (req,res)=>{
   const client= await pool.connect();
   try{
     const {to,amount}=req.body;
-    const fromUser=req.userId;
+    const from=req.userId;
 
     await client.query("BEGIN");
 
     const senderbalanceRes=await client.query(
-        "SELECT balance FROM accounts WHERE user_id=$1 FOR UPDATE ",
-        [fromUser]
+        "SELECT balance FROM account WHERE user_id=$1 FOR UPDATE ",
+        [from]
     );
 
     if(senderbalanceRes.rows.length==0){
@@ -50,24 +50,24 @@ router.post("/transfer",authMiddleware,async (req,res)=>{
     }
 
     const senderbalance=parseFloat(senderbalanceRes.rows[0].balance);
-    if(senderBalance<amount){
+    if(senderbalance<amount){
         throw new error("Insufficent balance");
     }
 
     const receiverbalanceRes=await client.query(
-        "SELECT balance FROM accounts WHERE user_id=$1 FOR UPDATE",
+        "SELECT balance FROM account WHERE user_id=$1 FOR UPDATE",
         [to]
     );
 
     if(receiverbalanceRes.rows.length==0){
         throw new Error("Receiver account not found");
     }
-    await client.query("UPDATE accounts SET balance =balance-$1 WHERE user_id=$2",[amount,from]);
+    await client.query("UPDATE account SET balance =balance-$1 WHERE user_id=$2",[amount,from]);
 
-    await client.query("UPDATE accounts SET balance= balance+$1 WHERE user_id=$2",[amount,to]);
+    await client.query("UPDATE account SET balance= balance+$1 WHERE user_id=$2",[amount,to]);
 
-    await client.query(`INSERT INTO tranasactions(from,to,amount,type,status,created_at)
-        VALUES($1,$2,$3,$3,$4,$5,NOW())`,[from,to,amount,"transfer","completed"]);
+    await client.query(`INSERT INTO transactions(from_user,to_user,amount,type,status,created_at)
+        VALUES($1,$2,$3,$4,$5,NOW())`,[from,to,amount,"transfer","completed"]);
 
 
         await client.query("COMMIT");
@@ -90,6 +90,7 @@ router.post("/transfer",authMiddleware,async (req,res)=>{
 
    
 
+  
   
 });
 
