@@ -1,0 +1,115 @@
+/* Container */
+.transaction-container {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 30px;
+  background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #e0e0e0;
+}
+
+/* Title */
+.transaction-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  text-align: center;
+  background: linear-gradient(90deg, #26a0da, #314755);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Form */
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  text-align: left;
+}
+
+/* Labels */
+.transaction-form label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #ccc;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inputs, Select, Textarea */
+.transaction-form input,
+.transaction-form select,
+.transaction-form textarea {
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #222;
+  color: #f0f0f0;
+  transition: 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.transaction-form input:focus,
+.transaction-form select:focus,
+.transaction-form textarea:focus {
+  outline: none;
+  border: 1px solid #4a90e2;
+  box-shadow: 0 0 8px #4a90e2;
+}
+
+/* Textarea */
+.transaction-form textarea {
+  resize: none;
+  min-height: 80px;
+}
+
+/* Button */
+.transaction-form button {
+  background-image: linear-gradient(to right, #314755 0%, #26a0da 51%, #314755 100%);
+  margin: 10px auto;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  box-shadow: 0 0 20px #26a0da80;
+  border-radius: 10px;
+  display: block;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.transaction-form button:hover {
+  background-position: right center;
+  box-shadow: 0 0 25px #26a0da;
+}
+
+/* Messages */
+.error-msg {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.success-msg {
+  color: #4caf50;
+  font-size: 14px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.3s ease;
+}
