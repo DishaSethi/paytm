@@ -16,6 +16,10 @@ export default function Dashboard() {
     const [weeklySpending,setWeeklySpending]=useState([]);
     const [categorySpending,setCategorySpending]=useState([]);
     const [transactions, setTransactions]=useState([]);
+    const [budgets, setBudgets] = useState([]);
+   const [totalIncome, setTotalIncome] = useState(0);
+   const [totalExpense, setTotalExpense] = useState(0);
+    const [remainingBudget, setRemainingBudget] = useState(0);
      const navigate=useNavigate();
 
 
@@ -94,10 +98,45 @@ const fetchTransactions=async()=>{
                 headers:{Authorization:`Bearer ${token}`},
             }
         );
+
+        const txns=res.data.transactions||[];
         setTransactions(res.data.transactions|| []);
+
+        const income=txns
+          .filter((t)=> t.type==="income")
+          .reduce((acc,t)=> acc+Number(t.amount),0);
+          
+        const expense=txns
+           .filter((t)=> t.type==="expense")
+           .reduce((acc,t)=> acc+ Number(t.amount),0);
+
+           setTotalIncome(income);
+           setTotalExpense(expense);
+
+           const totalBudget=budgets.reduce((acc,b)=> acc+Number(b.amount),0);
+           setRemainingBudget(totalBudget-expense);
     }catch(err){
         console.error("Error fetching transactions",err);
     }
+};
+
+const fetchBudgets= async ()=>{
+  const token=sessionStorage.getItem("token");
+  if(!token) return;
+
+  try{
+    const res=await axios.get("http://localhost:3000/api/v1/budget",{
+      headers:{
+        Authorization:`Bearer ${token}`
+      }
+    });
+    setBudgets(res.data.budgets||[]);
+  }catch(err){
+    console.error("Error fetching budgets:",err);
+  }
+
+
+
 }
 
 
@@ -106,6 +145,8 @@ const fetchTransactions=async()=>{
         fetchBalance();
         analyticsData();
         fetchTransactions();
+        fetchBudgets();
+
     },[]);
   return (
     <div className="dashboard-container">
@@ -117,9 +158,9 @@ const fetchTransactions=async()=>{
 
       <div className="summary-cards">
         <div className="card">Current Balance: ${balance}</div>
-        <div className="card">Total Income: ₹20,000</div>
-        <div className="card">Total Expense: ₹12,000</div>
-        <div className="card">Remaining Budget: ₹8,000</div>
+        <div className="card">Total Income: ${totalIncome}</div>
+        <div className="card">Total Expense: ${totalExpense}</div>
+        <div className="card">Remaining Budget: ${remainingBudget}</div>
       </div>
 
       <div className="charts">
@@ -165,12 +206,12 @@ const fetchTransactions=async()=>{
       <div className="quick-actions">
         <button className="btn" onClick={()=> navigate(`/transactionpage`)}>➕ Add Transaction</button>
         <button className="btn"  onClick={() => navigate(`/sendpage`)}>💸 Send Money</button>
-        <button className="btn">📊 Set Budget</button>
+        <button className="btn" onClick={()=> navigate(`/budgetpage`)}>📊 Set Budget</button>
       </div>
 
       <div className="transactions-list">
         <h3>Transactions</h3>
-        <table>
+        <table> 
           <thead>
             <tr>
               <th>Date</th>

@@ -4,6 +4,7 @@ import Dashboard1 from "./components/Dashboard1";
 import SendPage from "./components/SendPage";
 import Send from "./components/Send";
 import TransactionPage from "./components/TransactionPage";
+import BudgetPage from "./components/BudgetPage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -19,6 +20,9 @@ function App() {
 
     <Route path="/send/:id" element={<Send/>}/>
     <Route path="/transactionpage" element={<TransactionPage/>}/>
+    <Route path="/budgetpage" element={<BudgetPage/>}/>
+
+
     {/* <Route path/> */}
   
 
