@@ -114,4 +114,56 @@ router.post("/transactions",authMiddleware, async (req, res) => {
 });
 
 
+// In your transaction router file, update the /summary route with this code
+
+router.get("/summary", authMiddleware, async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    // 1. Define all the queries we need to run
+    const transactionSummaryQuery = `
+      SELECT
+        COALESCE(SUM(CASE WHEN to_user = $1 THEN amount ELSE 0 END), 0) AS total_income,
+        COALESCE(SUM(CASE WHEN from_user = $1 THEN amount ELSE 0 END), 0) AS total_expense
+      FROM transactions
+      WHERE from_user = $1 OR to_user = $1;
+    `;
+
+    const accountBalanceQuery = `SELECT balance FROM account WHERE user_id = $1;`;
+
+    const totalBudgetQuery = `
+      SELECT COALESCE(SUM(amount), 0) AS total_budget 
+      FROM budgets 
+      WHERE user_id = $1;
+    `;
+
+    // 2. Execute all queries in parallel for maximum efficiency
+    const [summaryResult, balanceResult, budgetResult] = await Promise.all([
+      pool.query(transactionSummaryQuery, [userId]),
+      pool.query(accountBalanceQuery, [userId]),
+      pool.query(totalBudgetQuery, [userId]),
+    ]);
+
+    // 3. Extract the results from each query
+    const { total_income, total_expense } = summaryResult.rows[0];
+    const current_balance = balanceResult.rows[0]?.balance || 0; // Default to 0 if no account exists
+    const total_budget = budgetResult.rows[0].total_budget;
+    
+    // 4. Calculate the remaining budget
+    const remaining_budget = parseFloat(total_budget) - parseFloat(total_expense);
+
+    // 5. Send all data back in a single response
+    res.json({
+      currentBalance: parseFloat(current_balance),
+      totalIncome: parseFloat(total_income),
+      totalExpense: parseFloat(total_expense),
+      remainingBudget: remaining_budget,
+    });
+
+  } catch (error) {
+    console.error("Failed to fetch dashboard summary:", error);
+    res.status(500).json({ message: "Server error while fetching summary." });
+  }
+});
+
 module.exports=router;
