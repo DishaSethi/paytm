@@ -36,6 +36,13 @@ router.post("/transfer",authMiddleware,async (req,res)=>{
   try{
     const {to,amount}=req.body;
     const from=req.userId;
+    if(from===to ){
+        return res.status(400).json({message:'Cannot send money to yourself'});
+
+    }
+    if(!amount || amount<=0){
+        return res.status(400).json({message:"Invalid amount, transfer amount must be positive"});
+    }
 
     await client.query("BEGIN");
 
@@ -71,6 +78,18 @@ router.post("/transfer",authMiddleware,async (req,res)=>{
 
 
         await client.query("COMMIT");
+//notification logic
+    //   const {toUserId}=req.body;
+      const fromUser=await pool.query('SELECT first_name FROM users WHERE id=$1',[req.userId]);
+      const senderName=fromUser.rows[0]?.first_name ||"Someone";
+      const notificationMessage=`You just received ${amount} from ${senderName}!`;
+
+      const payload=JSON.stringify({
+        userId:to,
+        message:notificationMessage
+      })
+
+      req.redisClient.publish("notifications",payload);
 
         res.status(200).json({
             message:"Transfer successful"

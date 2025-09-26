@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./Dashboard1.css";
 import axios from "axios";
+import {io} from "socket.io-client";
+import {jwtDecode} from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 import {
   BarChart,
   Bar,
@@ -99,10 +102,44 @@ export default function Dashboard() {
         console.error("Failed to load dashboard data:", error);
       }
     };
+    
 
     fetchDashboardData();
   }, []);
 
+  useEffect(()=>{
+    const token=sessionStorage.getItem("token");
+    if(!token) return;
+
+    const socket=io("http://localhost:3000");
+
+    socket.on("connect",()=>{
+      console.log("Connected to WebSocket server with ID:",socket.id);
+      try{
+        // const decodedToken=jwtDecode(token);
+        socket.emit("register",token);
+      }catch(error){
+        console.error("Invalid token:",error);
+      }
+    });
+
+     socket.on('notification',(data)=>{
+    console.log("Notification received:",data.message);
+    alert(data.message);
+    toast.success(data.message);
+
+       // ✅ **THE FIX: Re-fetch data to update the UI instantly**
+      fetchSummaryData(token);
+      fetchTransactionsList(token);
+  });
+
+  return () => {
+    console.log("Disconnection from WebSocket server");
+    socket.disconnect();
+  };
+}, []);
+
+ 
 
   // --- 4. JSX Return ---
 

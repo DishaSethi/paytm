@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { authMiddleware } = require("../middleware/middleware");
+const {cacheData}=require("../middleware/cache");
 const pool = require("../db");
 
-router.get("/analyticsData", authMiddleware, async (req, res) => {
+router.get("/analyticsData", authMiddleware,cacheData, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -58,5 +59,7 @@ router.get("/analyticsData", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch analytics" });
   }
 });
+
+
 
 module.exports = router;

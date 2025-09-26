@@ -6,11 +6,16 @@ import Send from "./components/Send";
 import TransactionPage from "./components/TransactionPage";
 import BudgetPage from "./components/BudgetPage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 
 function App() {
 
   return (
   <>
+        <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
   <Router>
   <Routes>
     <Route path="/signup" element={<Signup />} />

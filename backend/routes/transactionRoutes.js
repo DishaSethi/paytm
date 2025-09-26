@@ -1,6 +1,7 @@
 const express=require("express");
 const router=express.Router();
-const { authMiddleware } = require("../middleware/middleware");
+const { authMiddleware, } = require("../middleware/middleware");
+const {cacheData}=require("../middleware/cache");
 const pool=require("../db");
 // const Transaction = require("../models/transaction");
 
@@ -115,8 +116,7 @@ router.post("/transactions",authMiddleware, async (req, res) => {
 
 
 // In your transaction router file, update the /summary route with this code
-
-router.get("/summary", authMiddleware, async (req, res) => {
+router.get("/summary", authMiddleware, cacheData, async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -165,5 +165,6 @@ router.get("/summary", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error while fetching summary." });
   }
 });
+
 
 module.exports=router;
