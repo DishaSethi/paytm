@@ -1,11 +1,13 @@
 require("dotenv").config();
+const {redisClient,connectRedis}=require("./db/redis");
+// console.log("My Redis URL is:", process.env.REDIS_URL);
 // backend/index.js
 const express = require('express');
 const cors = require("cors");
-const redis=require("redis");
+
 const rootRouter = require("./routes/index");
 const app = express();
-const pool = require("./db"); 
+const pool = require("./db/db"); 
 
 const {initializeSocket}=require("./socket");
 // const redisClient=redis.createClient();
@@ -24,19 +26,34 @@ pool.connect()
   .then(() => console.log("Connected to PostgreSQL DB ✅"))
   .catch(err => console.error("Database connection error ❌", err));
 
-const redisClient=redis.createClient();
-redisClient.on("error",(err)=>console.log('Redis Client Error',err));
-(async()=>{
-  await redisClient.connect();
-  console.log("connected to Redis successfully!");
+// const redisClient=redis.createClient({url:process.env.REDIS_URL});
+// redisClient.on("error",(err)=>console.log('Redis Client Error',err));
+// (async()=>{
+//   await redisClient.connect();
+//   console.log("connected to Redis successfully!");
+// })();
+
+
+// In index.js
+
+// --- Redis Connection ---
+(async () => {
+  try {
+    await connectRedis();
+    console.log("Connected to Redis successfully!");
+  } catch (err) {
+    console.error("Failed to connect to Redis:", err);
+    // Optionally, you can exit the process if Redis is critical for your app to run
+    // process.exit(1); 
+  }
 })();
 
-const {io, userSocketMap}=initializeSocket(server,redisClient);
+const {io}=initializeSocket(server,redisClient);
 
 
 app.use((req,res,next)=>{
   req.io=io;
-  req.userSocketMap=userSocketMap;
+  // req.userSocketMap=userSocketMap;
   req.redisClient=redisClient;
   next();
 })

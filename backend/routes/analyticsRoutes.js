@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { authMiddleware } = require("../middleware/middleware");
 const {cacheData}=require("../middleware/cache");
-const pool = require("../db");
+const pool = require("../db/db");
 
 router.get("/analyticsData", authMiddleware,cacheData, async (req, res) => {
   const userId = req.userId;

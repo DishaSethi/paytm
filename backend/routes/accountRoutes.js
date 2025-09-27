@@ -3,7 +3,7 @@ const Account=require("../models/user").Account;
 const Transaction = require("../models/transaction"); 
 const express=require("express");
 const router=express.Router();
-const pool=require("../db");
+const pool=require("../db/db");
 
 router.get("/balance",authMiddleware,async(req,res)=>{
  try{

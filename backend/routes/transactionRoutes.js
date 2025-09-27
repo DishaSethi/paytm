@@ -2,7 +2,7 @@ const express=require("express");
 const router=express.Router();
 const { authMiddleware, } = require("../middleware/middleware");
 const {cacheData}=require("../middleware/cache");
-const pool=require("../db");
+const pool=require("../db/db");
 // const Transaction = require("../models/transaction");
 
 // router.get("/transactions",authMiddleware,async(req,res)=>{

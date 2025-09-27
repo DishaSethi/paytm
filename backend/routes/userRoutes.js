@@ -6,7 +6,7 @@ const { Account } = require("../models/user");
 const {authMiddleware}=require("../middleware/middleware");
 const express=require("express");
 const router=express.Router();
-const pool=require("../db");
+const pool=require("../db/db");
 
 const signupBody = zod.object({
     username: zod.string().email(),

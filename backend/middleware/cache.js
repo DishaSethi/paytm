@@ -1,9 +1,6 @@
 const redis=require("redis");
 //we are creating a newClient here for simiplicity but sharing one is better
-const redisClient=redis.createClient();
-if(!redisClient.isOpen){
-    redisClient.connect();
-}
+const {redisClient}=require("../db/redis");
 
 
 const cacheData=async(req,res,next)=>{
@@ -20,7 +17,7 @@ const cacheData=async(req,res,next)=>{
             console.log(`CACHE MISS for key:${cacheKey}`);
 
             const originalSend=res.send.bind(res);
-            res.send=async(body)=>{
+            res.send=(body)=>{
                 redisClient.setEx(cacheKey,300,body);
                 originalSend(body);
             }
